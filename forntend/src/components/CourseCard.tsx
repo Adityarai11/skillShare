@@ -1,35 +1,42 @@
 import React from 'react';
-import { Star } from 'lucide-react';
-import { Course } from '../types';
+import { api } from '../services/api';
 
-interface CourseCardProps {
-  course: Course;
+interface CourseProps {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  imageUrl: string;
 }
 
-export function CourseCard({ course }: CourseCardProps) {
+const CourseCard: React.FC<CourseProps> = ({ id, title, description, price, imageUrl }) => {
+  const handlePurchase = async () => {
+    try {
+      await api.post('/course/purchase', { courseId: id });
+      alert('Course purchased successfully!');
+    } catch (error) {
+      alert('Failed to purchase course');
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
-      <img
-        src={course.imageUrl}
-        alt={course.title}
-        className="w-full h-48 object-cover"
-      />
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src={imageUrl} alt={title} className="w-full h-48 object-cover" />
       <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-indigo-600">{course.level}</span>
-          <div className="flex items-center">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span className="ml-1 text-sm text-gray-600">{course.rating}</span>
-          </div>
+        <h3 className="text-xl font-semibold">{title}</h3>
+        <p className="text-gray-600 mt-2">{description}</p>
+        <div className="mt-4 flex justify-between items-center">
+          <span className="text-lg font-bold">${price}</span>
+          <button 
+            onClick={handlePurchase}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Purchase
+          </button>
         </div>
-        <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.description}</p>
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-indigo-600">${course.price}</span>
-          <span className="text-sm text-gray-500">{course.duration}</span>
-        </div>
-        <p className="text-sm text-gray-500 mt-2">By {course.instructor}</p>
       </div>
     </div>
   );
-}
+};
+
+export default CourseCard;
